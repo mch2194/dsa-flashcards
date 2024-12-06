@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DSA Flashcards</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+            background-color: #f0f0f0;
+        }
+
+        .card-container {
+            width: 600px;
+            height: 300px;
+            perspective: 1000px;
+            margin: 20px;
+        }
+
+        .card {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            cursor: pointer;
+            transform-style: preserve-3d;
+            transition: transform 0.6s;
+        }
+
+        .card.flipped {
+            transform: rotateY(180deg);
+        }
+
+        .card-face {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            backface-visibility: hidden;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            box-sizing: border-box;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            background: white;
+            text-align: center;
+        }
+
+        .card-back {
+            transform: rotateY(180deg);
+        }
+
+        .controls {
+            margin-top: 20px;
+            display: flex;
+            gap: 10px;
+        }
+
+        button {
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+            border: none;
+            border-radius: 5px;
+            background-color: #4CAF50;
+            color: white;
+            transition: background-color 0.3s;
+        }
+
+        button:hover {
+            background-color: #45a049;
+        }
+
+        .counter {
+            margin-top: 10px;
+            font-size: 14px;
+        }
+
+        .keyboard-shortcuts {
+            margin-top: 20px;
+            font-size: 14px;
+            color: #666;
+        }
+    </style>
+</head>
+<body>
+    <h1>DSA Flashcards</h1>
+    
+    <div class="card-container">
+        <div class="card" id="flashcard">
+            <div class="card-face card-front">
+                Loading...
+            </div>
+            <div class="card-face card-back">
+                Loading...
+            </div>
+        </div>
+    </div>
+
+    <div class="controls">
+        <button onclick="previousCard()">Previous</button>
+        <button onclick="flipCard()">Flip</button>
+        <button onclick="nextCard()">Next</button>
+    </div>
+
+    <div class="counter" id="counter"></div>
+
+    <div class="keyboard-shortcuts">
+        Keyboard shortcuts: ← Previous | Space Flip | → Next
+    </div>
+
+    <script>
+        const flashcards = [
+            {
+                front: "What is the two-pointer technique?",
+                back: "A strategy that uses two reference points in an array/string to solve problems efficiently, typically running in O(n) time and O(1) space."
+            },
+            {
+                front: "What are the two main patterns of the two-pointer technique?",
+                back: "1. Opposite Direction Pointers (start from ends, move towards middle)\n2. Same Direction Pointers (both start left, move right at different speeds)"
+            },
+            {
+                front: "What is the time complexity of most two-pointer algorithms?",
+                back: "O(n) - as we typically only need to traverse the array/string once"
+            },
+            {
+                front: "What are three real-world applications of the two-pointer technique?",
+                back: "1. Data Deduplication (database cleaning, log processing)\n2. Financial Analysis (finding transaction pairs, market data analysis)\n3. Text Processing (palindrome validation, string matching)"
+            },
+            {
+                front: "When would you use opposite direction pointers?",
+                back: "When working with problems involving:\n- Array reversal\n- Palindrome checking\n- Finding pairs from opposite ends of sorted data"
+            },
+            {
+                front: "When would you use same direction pointers?",
+                back: "When working with problems involving:\n- Finding cycles\n- Removing duplicates\n- Moving at different speeds through data"
+            },
+            {
+                front: "What is the basic structure of a two-pointer array reversal?",
+                back: "left = 0\nright = len(arr) - 1\nwhile left < right:\n    arr[left], arr[right] = arr[right], arr[left]\n    left += 1\n    right -= 1"
+            },
+            {
+                front: "How do you implement finding a pair with target sum using two pointers?",
+                back: "left = 0\nright = len(arr) - 1\nwhile left < right:\n    if arr[left] + arr[right] == target:\n        return [left, right]\n    elif arr[left] + arr[right] < target:\n        left += 1\n    else:\n        right -= 1"
+            },
+            {
+                front: "What's the key idea behind removing duplicates with two pointers?",
+                back: "Use a write_pointer to track where to place the next unique element, and a read_pointer to scan through the array. Only move the write_pointer when finding a new unique element."
+            },
+            {
+                front: "How do you determine if a string is a palindrome using two pointers?",
+                back: "1. Clean the string (remove non-alphanumeric, convert to lowercase)\n2. Set pointers at start and end\n3. Compare characters and move inward\n4. Return false if any mismatch, true if pointers meet"
+            },
+            {
+                front: "What's the advantage of using two pointers over other methods?",
+                back: "- Constant space complexity O(1)\n- Linear time complexity O(n)\n- In-place modification when needed\n- No extra data structures required"
+            }
+        ];
+
+        let currentCardIndex = 0;
+        let isFlipped = false;
+
+        function updateCard() {
+            const card = flashcards[currentCardIndex];
+            document.querySelector('.card-front').textContent = card.front;
+            document.querySelector('.card-back').textContent = card.back;
+            document.getElementById('counter').textContent = `Card ${currentCardIndex + 1} of ${flashcards.length}`;
+        }
+
+        function flipCard() {
+            const card = document.getElementById('flashcard');
+            card.classList.toggle('flipped');
+            isFlipped = !isFlipped;
+        }
+
+        function nextCard() {
+            if (currentCardIndex < flashcards.length - 1) {
+                currentCardIndex++;
+                updateCard();
+                if (isFlipped) flipCard();
+            }
+        }
+
+        function previousCard() {
+            if (currentCardIndex > 0) {
+                currentCardIndex--;
+                updateCard();
+                if (isFlipped) flipCard();
+            }
+        }
+
+        // Keyboard shortcuts
+        document.addEventListener('keydown', (e) => {
+            if (e.code === 'Space') {
+                e.preventDefault();
+                flipCard();
+            } else if (e.code === 'ArrowRight') {
+                nextCard();
+            } else if (e.code === 'ArrowLeft') {
+                previousCard();
+            }
+        });
+
+        // Initialize
+        updateCard();
+    </script>
+</body>
+</html>
